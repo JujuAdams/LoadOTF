@@ -1,6 +1,6 @@
-function trace()
+function __scribble_trace()
 {
-    var _string = "";
+    var _string = "Scribble: ";
     var _i = 0;
     repeat(argument_count)
     {

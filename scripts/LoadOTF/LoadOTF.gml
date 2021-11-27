@@ -8,9 +8,9 @@
 
 function LoadOTF(_filename)
 {
-    trace("Loading \"", _filename, "\"");
+    __scribble_trace("Loading \"", _filename, "\"");
     var _buffer = buffer_load(_filename);
-    trace("Size = 0x", ptr(buffer_get_size(_buffer)), " (d=", buffer_get_size(_buffer), ")");
+    __scribble_trace("Size = 0x", ptr(buffer_get_size(_buffer)), " (d=", buffer_get_size(_buffer), ")");
     
     
     
@@ -24,20 +24,20 @@ function LoadOTF(_filename)
     
     if (_sfntVersion == 0x00010000)
     {
-        trace("Valid table directory version found (TrueType outlines)");
+        __scribble_trace("Valid table directory version found (TrueType outlines)");
     }
     else if (_sfntVersion == 0x4F5454AF)
     {
-        trace("Valid table directory version found (contains CFF data)");
+        __scribble_trace("Valid table directory version found (contains CFF data)");
     }
     else
     {
-        trace("Table directory version not recognised (", ptr(_sfntVersion), ")");
+        __scribble_trace("Table directory version not recognised (", ptr(_sfntVersion), ")");
         buffer_delete(_buffer);
         return;
     }
     
-    trace("Found ", _numTables, " tables");
+    __scribble_trace("Found ", _numTables, " tables");
     
     var _tableDictionary = {};
     var _tableOrderArray = [];
@@ -49,7 +49,7 @@ function LoadOTF(_filename)
         var _offset   = BUF_U32;
         var _length   = BUF_U32;
         
-        trace("\"", _tableTag, "\", offset = ", ptr(_offset), ", length = ", ptr(_length), " (end = ", ptr(_offset + _length), ")");
+        __scribble_trace("\"", _tableTag, "\", offset = ", ptr(_offset), ", length = ", ptr(_length), " (end = ", ptr(_offset + _length), ")");
         
         var _data = {   
             tag    : _tableTag,
@@ -75,12 +75,12 @@ function LoadOTF(_filename)
     var _tableData = _tableDictionary[$ "head"];
     if (!is_struct(_tableData))
     {
-        trace("\"head\" table not found");
+        __scribble_trace("\"head\" table not found");
         return;
     }
     else
     {
-        trace("\"head\" table found, offset = 0x", ptr(_tableData.offset), ", length = ", ptr(_tableData.length));
+        __scribble_trace("\"head\" table found, offset = 0x", ptr(_tableData.offset), ", length = ", ptr(_tableData.length));
         buffer_seek(_buffer, buffer_seek_start, _tableData.offset);
         
         var _majorVersion     = BUF_U16;
@@ -104,11 +104,11 @@ function LoadOTF(_filename)
         
         if (_magicNumber != 0x5F0F3CF5)
         {
-            trace("\"head\" magic number is invalid (", ptr(_magicNumber), ")");
+            __scribble_trace("\"head\" magic number is invalid (", ptr(_magicNumber), ")");
             return;
         }
         
-        trace("Units per em = ", _unitsPerEm, ", indexToLocFormat = ", _indexToLocFormat);
+        __scribble_trace("Units per em = ", _unitsPerEm, ", indexToLocFormat = ", _indexToLocFormat);
     }
     
     #endregion
@@ -121,26 +121,26 @@ function LoadOTF(_filename)
     var _tableData = _tableDictionary[$ "cmap"];
     if (!is_struct(_tableData))
     {
-        trace("\"cmap\" table not found");
+        __scribble_trace("\"cmap\" table not found");
         return;
     }
     else
     {
-        trace("\"cmap\" table found, offset = 0x", ptr(_tableData.offset), ", length = ", ptr(_tableData.length));
+        __scribble_trace("\"cmap\" table found, offset = 0x", ptr(_tableData.offset), ", length = ", ptr(_tableData.length));
         buffer_seek(_buffer, buffer_seek_start, _tableData.offset);
         
         var _version   = BUF_U16;
         var _numTables = BUF_U16;
         
-        trace("cmap table is version ", _version);
+        __scribble_trace("cmap table is version ", _version);
         
         if (_version != 0)
         {
-            trace("cmap version not recognised");
+            __scribble_trace("cmap version not recognised");
             return;
         }
         
-        trace(_numTables, " cmap tables found");
+        __scribble_trace(_numTables, " cmap tables found");
         
         var _platformDictionary = {};
         repeat(_numTables)
@@ -149,7 +149,7 @@ function LoadOTF(_filename)
             var _encodingID     = BUF_U16;
             var _subtableOffset = BUF_U32;
             
-            trace("platformID = ", _platformID, ", encodingID = ", _encodingID, ", subtableOffset = ", _subtableOffset);
+            __scribble_trace("platformID = ", _platformID, ", encodingID = ", _encodingID, ", subtableOffset = ", _subtableOffset);
             
             var _metadata = {
                 platformID     : _platformID,
@@ -163,7 +163,7 @@ function LoadOTF(_filename)
         var _subtableMetadata = _platformDictionary[$ 0];
         if (_subtableMetadata == undefined)
         {
-            trace("Unicode platform data not found");
+            __scribble_trace("Unicode platform data not found");
             return;
         }
         
@@ -179,11 +179,11 @@ function LoadOTF(_filename)
         
         if (_subtableFormat == undefined)
         {
-            trace("Unicode encoding ID not supported");
+            __scribble_trace("Unicode encoding ID not supported");
             return;
         }
         
-        trace("Subtable format chosen as ", _subtableFormat);
+        __scribble_trace("Subtable format chosen as ", _subtableFormat);
         
         buffer_seek(_buffer, buffer_seek_start, _subtableMetadata.subtableOffset + _tableData.offset);
         
@@ -192,7 +192,7 @@ function LoadOTF(_filename)
             var _format = BUF_U16;
             if (_format != 4)
             {
-                trace("Was expecting format ID 4 but got ", _format);
+                __scribble_trace("Was expecting format ID 4 but got ", _format);
                 return;
             }
             
@@ -204,7 +204,7 @@ function LoadOTF(_filename)
             var _rangeShift    = BUF_U16;
             
             var _segCount = _segCountx2 div 2;
-            trace("Found ", _segCount, " segments");
+            __scribble_trace("Found ", _segCount, " segments");
             
             var _endCountArray      = array_create(_segCount);
             var _startCountArray    = array_create(_segCount);
@@ -221,7 +221,7 @@ function LoadOTF(_filename)
             var _padding = BUF_U16;
             if (_padding != 0)
             {
-                trace("Padding interrupted by erroneous data");
+                __scribble_trace("Padding interrupted by erroneous data");
                 return;
             }
             
@@ -280,7 +280,7 @@ function LoadOTF(_filename)
                     {
                         if (_idToUnicodeArray[_id] != 0)
                         {
-                            trace("Warning! ", _id, " overwritten. Old charcode = ", _idToUnicodeArray[_id], ", new = ", _charCode);
+                            __scribble_trace("Warning! ", _id, " overwritten. Old charcode = ", _idToUnicodeArray[_id], ", new = ", _charCode);
                         }
                     }
                     
@@ -292,23 +292,23 @@ function LoadOTF(_filename)
                 ++_i;
             }
             
-            trace("idToUnicodeArray = ", _idToUnicodeArray);
+            __scribble_trace("idToUnicodeArray = ", _idToUnicodeArray);
             
             //var _unicodeCoveredArray = array_create(array_length(_idToUnicodeArray));
             //array_copy(_unicodeCoveredArray, 0, _idToUnicodeArray, 0, array_length(_idToUnicodeArray));
             //array_sort(_unicodeCoveredArray, true);
-            //trace("Unicode covered = ", _unicodeCoveredArray);
+            //__scribble_trace("Unicode covered = ", _unicodeCoveredArray);
             //
             //var _i = 0;
             //repeat(array_length(_unicodeCoveredArray))
             //{
-            //    trace(_unicodeCoveredArray[_i], " = \"", chr(_unicodeCoveredArray[_i]), "\"");
+            //    __scribble_trace(_unicodeCoveredArray[_i], " = \"", chr(_unicodeCoveredArray[_i]), "\"");
             //    ++_i;
             //}
         }
         else if (_subtableFormat == 12)
         {
-            trace("Format 12 not currently supported");
+            __scribble_trace("Format 12 not currently supported");
         }
     }
     
@@ -321,12 +321,12 @@ function LoadOTF(_filename)
     //var _tableData = _tableDictionary[$ "GPOS"];
     //if (!is_struct(_tableData))
     //{
-    //    trace("\"GPOS\" table not found");
+    //    __scribble_trace("\"GPOS\" table not found");
     //    return;
     //}
     //else
     //{
-    //    trace("\"GPOS\" table found, offset = 0x", ptr(_tableData.offset), ", length = ", ptr(_tableData.length));
+    //    __scribble_trace("\"GPOS\" table found, offset = 0x", ptr(_tableData.offset), ", length = ", ptr(_tableData.length));
     //    buffer_seek(_buffer, buffer_seek_start, _tableData.offset);
     //    
     //    var _majorVersion      = BUF_U16;
@@ -335,7 +335,7 @@ function LoadOTF(_filename)
     //    var _featureListOffset = BUF_U16 + _tableData.offset;
     //    var _lookupListOffset  = BUF_U16 + _tableData.offset;
     //    
-    //    trace("\"GPOS\" table is version ", _majorVersion, ".", _minorVersion);
+    //    __scribble_trace("\"GPOS\" table is version ", _majorVersion, ".", _minorVersion);
     //    
     //    if ((_majorVersion == 1) && (_minorVersion == 0))
     //    {
@@ -344,11 +344,11 @@ function LoadOTF(_filename)
     //    else if ((_majorVersion == 1) && (_minorVersion == 1))
     //    {
     //        var featureVariationsOffset = BUF_U32;
-    //        trace("Warning! This \"GPOS\" table version has only partial support");
+    //        __scribble_trace("Warning! This \"GPOS\" table version has only partial support");
     //    }
     //    else
     //    {
-    //        trace("\"GPOS\" table version not supported");
+    //        __scribble_trace("\"GPOS\" table version not supported");
     //        return;
     //    }
     //    
@@ -358,7 +358,7 @@ function LoadOTF(_filename)
     //    //
     //    //var _languageCount = BUF_U16;
     //    //
-    //    //trace("Found ", _languageCount, " languages");
+    //    //__scribble_trace("Found ", _languageCount, " languages");
     //    //var _languageArray = array_create(_languageCount);
     //    //var _i = 0;
     //    //repeat(_languageCount)
@@ -379,7 +379,7 @@ function LoadOTF(_filename)
     //    buffer_seek(_buffer, buffer_seek_start, _lookupListOffset);
     //    
     //    var _lookupCount = BUF_U16;
-    //    trace("Found ", _lookupCount, " lookup tables");
+    //    __scribble_trace("Found ", _lookupCount, " lookup tables");
     //    
     //    var _lookupOffsetArray = array_create(_lookupCount);
     //    var _i = 0;
@@ -392,7 +392,7 @@ function LoadOTF(_filename)
     //    var _i = 0;
     //    repeat(_lookupCount)
     //    {
-    //        trace("Reading lookup table ", _i);
+    //        __scribble_trace("Reading lookup table ", _i);
     //        
     //        var _lookupOffset = _lookupOffsetArray[_i];
     //        buffer_seek(_buffer, buffer_seek_start, _lookupOffset);
@@ -400,7 +400,7 @@ function LoadOTF(_filename)
     //        var _lookupType    = BUF_U16;
     //        var _lookupFlags   = BUF_U16;
     //        var _subtableCount = BUF_U16;
-    //        trace("Found ", _subtableCount, " subtables");
+    //        __scribble_trace("Found ", _subtableCount, " subtables");
     //        
     //        var _subtableOffsetArray = array_create(_subtableCount);
     //        var _j = 0;
@@ -412,13 +412,13 @@ function LoadOTF(_filename)
     //        
     //        var _markFilteringSet = BUF_U16;
     //        
-    //        trace("type = ", _lookupType, ", flags = ", ptr(_lookupFlags), ", mark filtering set = ", _markFilteringSet);
+    //        __scribble_trace("type = ", _lookupType, ", flags = ", ptr(_lookupFlags), ", mark filtering set = ", _markFilteringSet);
     //        
     //        var _j = 0;
     //        repeat(_subtableCount)
     //        {
     //            var _subtableOffset = _subtableOffsetArray[@ _j];
-    //            trace("Reading subtable ", _j, " (of lookup table ", _i, ")");
+    //            __scribble_trace("Reading subtable ", _j, " (of lookup table ", _i, ")");
     //            
     //            var _posFormat = BUF_U16;
     //            switch(_posFormat)
@@ -444,7 +444,7 @@ function LoadOTF(_filename)
     //                break;
     //                
     //                default:
-    //                    trace("\"GPOS\" lookup subtable format ", _posFormat, " not supported");
+    //                    __scribble_trace("\"GPOS\" lookup subtable format ", _posFormat, " not supported");
     //                break;
     //            }
     //            
@@ -464,12 +464,12 @@ function LoadOTF(_filename)
     var _tableData = _tableDictionary[$ "GSUB"];
     if (!is_struct(_tableData))
     {
-        trace("\"GSUB\" table not found");
+        __scribble_trace("\"GSUB\" table not found");
         return;
     }
     else
     {
-        trace("\"GSUB\" table found, offset = 0x", ptr(_tableData.offset), ", length = ", ptr(_tableData.length));
+        __scribble_trace("\"GSUB\" table found, offset = 0x", ptr(_tableData.offset), ", length = ", ptr(_tableData.length));
         buffer_seek(_buffer, buffer_seek_start, _tableData.offset);
         
         var _majorVersion      = BUF_U16;
@@ -478,7 +478,7 @@ function LoadOTF(_filename)
         var _featureListOffset = BUF_U16 + _tableData.offset;
         var _lookupListOffset  = BUF_U16 + _tableData.offset;
         
-        trace("\"GSUB\" table is version ", _majorVersion, ".", _minorVersion);
+        __scribble_trace("\"GSUB\" table is version ", _majorVersion, ".", _minorVersion);
         
         if ((_majorVersion == 1) && (_minorVersion == 0))
         {
@@ -487,11 +487,11 @@ function LoadOTF(_filename)
         else if ((_majorVersion == 1) && (_minorVersion == 1))
         {
             var featureVariationsOffset = BUF_U32;
-            trace("Warning! This \"GSUB\" table version has only partial support");
+            __scribble_trace("Warning! This \"GSUB\" table version has only partial support");
         }
         else
         {
-            trace("\"GSUB\" table version not supported");
+            __scribble_trace("\"GSUB\" table version not supported");
             return;
         }
         
@@ -500,7 +500,7 @@ function LoadOTF(_filename)
         buffer_seek(_buffer, buffer_seek_start, _lookupListOffset);
         
         var _lookupCount = BUF_U16;
-        trace("Found ", _lookupCount, " lookup tables");
+        __scribble_trace("Found ", _lookupCount, " lookup tables");
         
         var _lookupOffsetArray = array_create(_lookupCount);
         var _i = 0;
@@ -513,7 +513,7 @@ function LoadOTF(_filename)
         var _i = 0;
         repeat(_lookupCount)
         {
-            trace("Reading lookup table ", _i);
+            __scribble_trace("Reading lookup table ", _i);
             
             var _lookupOffset = _lookupOffsetArray[_i];
             buffer_seek(_buffer, buffer_seek_start, _lookupOffset);
@@ -521,7 +521,7 @@ function LoadOTF(_filename)
             var _lookupType    = BUF_U16;
             var _lookupFlags   = BUF_U16;
             var _subtableCount = BUF_U16;
-            trace("Found ", _subtableCount, " subtables");
+            __scribble_trace("Found ", _subtableCount, " subtables");
             
             var _subtableOffsetArray = array_create(_subtableCount);
             var _j = 0;
@@ -533,13 +533,13 @@ function LoadOTF(_filename)
             
             var _markFilteringSet = BUF_U16;
             
-            trace("type = ", _lookupType, ", flags = ", ptr(_lookupFlags), ", mark filtering set = ", _markFilteringSet);
+            __scribble_trace("type = ", _lookupType, ", flags = ", ptr(_lookupFlags), ", mark filtering set = ", _markFilteringSet);
             
             var _j = 0;
             repeat(_subtableCount)
             {
                 var _subtableOffset = _subtableOffsetArray[@ _j];
-                trace("Reading subtable ", _j, " (of lookup table ", _i, ")");
+                __scribble_trace("Reading subtable ", _j, " (of lookup table ", _i, ")");
                 
                 var _posFormat = BUF_U16;
                 switch(_posFormat)
@@ -565,7 +565,7 @@ function LoadOTF(_filename)
                     break;
                     
                     default:
-                        trace("\"GPOS\" lookup subtable format ", _posFormat, " not supported");
+                        __scribble_trace("\"GPOS\" lookup subtable format ", _posFormat, " not supported");
                     break;
                 }
                 

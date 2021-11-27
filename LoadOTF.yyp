@@ -1,9 +1,9 @@
 {
   "resources": [
+    {"id":{"name":"__scribble_otf_class","path":"scripts/__scribble_otf_class/__scribble_otf_class.yy",},"order":0,},
     {"id":{"name":"trace","path":"scripts/trace/trace.yy",},"order":5,},
-    {"id":{"name":"OTFReadValueFormat","path":"scripts/OTFReadValueFormat/OTFReadValueFormat.yy",},"order":6,},
-    {"id":{"name":"__BufferFunctions__","path":"scripts/__BufferFunctions__/__BufferFunctions__.yy",},"order":4,},
     {"id":{"name":"oTest","path":"objects/oTest/oTest.yy",},"order":2,},
+    {"id":{"name":"__scribble_buffer","path":"scripts/__scribble_buffer/__scribble_buffer.yy",},"order":1,},
     {"id":{"name":"LoadOTF","path":"scripts/LoadOTF/LoadOTF.yy",},"order":3,},
     {"id":{"name":"rMain","path":"rooms/rMain/rMain.yy",},"order":1,},
   ],
@@ -33,7 +33,10 @@
   "RoomOrderNodes": [
     {"roomId":{"name":"rMain","path":"rooms/rMain/rMain.yy",},},
   ],
-  "Folders": [],
+  "Folders": [
+    {"folderPath":"folders/Scribble/OTF.yy","order":0,"resourceVersion":"1.0","name":"OTF","tags":[],"resourceType":"GMFolder",},
+    {"folderPath":"folders/Scribble.yy","order":9,"resourceVersion":"1.0","name":"Scribble","tags":[],"resourceType":"GMFolder",},
+  ],
   "AudioGroups": [
     {"targets":-1,"resourceVersion":"1.3","name":"audiogroup_default","resourceType":"GMAudioGroup",},
   ],

@@ -2,11 +2,11 @@
   "isDnD": false,
   "isCompatibility": false,
   "parent": {
-    "name": "LoadOTF",
-    "path": "LoadOTF.yyp",
+    "name": "OTF",
+    "path": "folders/Scribble/OTF.yy",
   },
   "resourceVersion": "1.0",
-  "name": "OTFReadValueFormat",
+  "name": "__scribble_otf_class",
   "tags": [],
   "resourceType": "GMScript",
 }
