@@ -1,1 +1,1 @@
-LoadOTF("ComicNeueAngular-Bold.ttf");
+LoadOTF("Garuda.ttf");

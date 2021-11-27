@@ -4,6 +4,7 @@
 #macro BUF_U64      buffer_read_little(_buffer, buffer_u64)
 #macro BUF_S16      buffer_read_little(_buffer, buffer_s16)
 #macro BUF_FIXED32  buffer_read(_buffer, buffer_s32) //TODO
+#macro BUF_TAG      buffer_read_tag(_buffer)
 
 function LoadOTF(_filename)
 {
@@ -43,7 +44,7 @@ function LoadOTF(_filename)
     
     repeat(_numTables)
     {
-        var _tableTag = buffer_read_tag(_buffer);
+        var _tableTag = BUF_TAG;
         var _checksum = BUF_U32;
         var _offset   = BUF_U32;
         var _length   = BUF_U32;
@@ -316,30 +317,264 @@ function LoadOTF(_filename)
     
     
     #region GPOS
-    
-    //if (_GPOS_offset == undefined)
+    //
+    //var _tableData = _tableDictionary[$ "GPOS"];
+    //if (!is_struct(_tableData))
     //{
-    //    trace("GPOS table not found");
+    //    trace("\"GPOS\" table not found");
+    //    return;
     //}
     //else
     //{
-    //    trace("GPOS table found, offset = ", _GPOS_offset, ", length = ", _GPOS_length);
+    //    trace("\"GPOS\" table found, offset = 0x", ptr(_tableData.offset), ", length = ", ptr(_tableData.length));
+    //    buffer_seek(_buffer, buffer_seek_start, _tableData.offset);
+    //    
+    //    var _majorVersion      = BUF_U16;
+    //    var _minorVersion      = BUF_U16;
+    //    var _scriptListOffset  = BUF_U16 + _tableData.offset;
+    //    var _featureListOffset = BUF_U16 + _tableData.offset;
+    //    var _lookupListOffset  = BUF_U16 + _tableData.offset;
+    //    
+    //    trace("\"GPOS\" table is version ", _majorVersion, ".", _minorVersion);
+    //    
+    //    if ((_majorVersion == 1) && (_minorVersion == 0))
+    //    {
+    //        var _featureVariationsOffset = undefined;
+    //    }
+    //    else if ((_majorVersion == 1) && (_minorVersion == 1))
+    //    {
+    //        var featureVariationsOffset = BUF_U32;
+    //        trace("Warning! This \"GPOS\" table version has only partial support");
+    //    }
+    //    else
+    //    {
+    //        trace("\"GPOS\" table version not supported");
+    //        return;
+    //    }
+    //    
+    //    
+    //    
+    //    //buffer_seek(_buffer, buffer_seek_start, _scriptListOffset);
+    //    //
+    //    //var _languageCount = BUF_U16;
+    //    //
+    //    //trace("Found ", _languageCount, " languages");
+    //    //var _languageArray = array_create(_languageCount);
+    //    //var _i = 0;
+    //    //repeat(_languageCount)
+    //    //{
+    //    //    var _tag    = BUF_TAG;
+    //    //    var _offset = BUF_U16;
+    //    //    
+    //    //    _languageArray[@ _i] = {
+    //    //        tag    : _tag,
+    //    //        offset : _offset,
+    //    //    };
+    //    //    
+    //    //    ++_i;
+    //    //}
+    //    
+    //    
+    //    
+    //    buffer_seek(_buffer, buffer_seek_start, _lookupListOffset);
+    //    
+    //    var _lookupCount = BUF_U16;
+    //    trace("Found ", _lookupCount, " lookup tables");
+    //    
+    //    var _lookupOffsetArray = array_create(_lookupCount);
+    //    var _i = 0;
+    //    repeat(_lookupCount)
+    //    {
+    //        _lookupOffsetArray[@ _i] = BUF_U16 + _lookupListOffset;
+    //        ++_i;
+    //    }
+    //    
+    //    var _i = 0;
+    //    repeat(_lookupCount)
+    //    {
+    //        trace("Reading lookup table ", _i);
+    //        
+    //        var _lookupOffset = _lookupOffsetArray[_i];
+    //        buffer_seek(_buffer, buffer_seek_start, _lookupOffset);
+    //        
+    //        var _lookupType    = BUF_U16;
+    //        var _lookupFlags   = BUF_U16;
+    //        var _subtableCount = BUF_U16;
+    //        trace("Found ", _subtableCount, " subtables");
+    //        
+    //        var _subtableOffsetArray = array_create(_subtableCount);
+    //        var _j = 0;
+    //        repeat(_subtableCount)
+    //        {
+    //            _subtableOffsetArray[@ _j] = BUF_U16 + _lookupOffset;
+    //            ++_j;
+    //        }
+    //        
+    //        var _markFilteringSet = BUF_U16;
+    //        
+    //        trace("type = ", _lookupType, ", flags = ", ptr(_lookupFlags), ", mark filtering set = ", _markFilteringSet);
+    //        
+    //        var _j = 0;
+    //        repeat(_subtableCount)
+    //        {
+    //            var _subtableOffset = _subtableOffsetArray[@ _j];
+    //            trace("Reading subtable ", _j, " (of lookup table ", _i, ")");
+    //            
+    //            var _posFormat = BUF_U16;
+    //            switch(_posFormat)
+    //            {
+    //                case 1:
+    //                    var _coverageOffset   = BUF_U16 + _subtableOffset;
+    //                    var _valueFormat      = BUF_U16;
+    //                    var _valueRecordArray = [OTFReadValueRecord(_buffer, _valueFormat, 0)];
+    //                break;
+    //                
+    //                case 2:
+    //                    var _coverageOffset = BUF_U16 + _subtableOffset;
+    //                    var _valueFormat    = BUF_U16;
+    //                    var _valueCount     = BUF_U16;
+    //                    
+    //                    var _valueRecordArray = array_create(_valueCount);
+    //                    var _k = 0;
+    //                    repeat(_valueCount)
+    //                    {
+    //                        _valueRecordArray[@ _k] = [OTFReadValueRecord(_buffer, _valueFormat, 0)];
+    //                        ++_k;
+    //                    }
+    //                break;
+    //                
+    //                default:
+    //                    trace("\"GPOS\" lookup subtable format ", _posFormat, " not supported");
+    //                break;
+    //            }
+    //            
+    //            ++_j;
+    //        }
+    //        
+    //        ++_i;
+    //    }
     //}
-    
+    //
     #endregion
     
     
     
     #region GSUB
     
-    //if (_GSUB_offset == undefined)
-    //{
-    //    trace("GSUB table not found");
-    //}
-    //else
-    //{
-    //    trace("GSUB table found, offset = ", _GSUB_offset, ", length = ", _GSUB_length);
-    //}
+    var _tableData = _tableDictionary[$ "GSUB"];
+    if (!is_struct(_tableData))
+    {
+        trace("\"GSUB\" table not found");
+        return;
+    }
+    else
+    {
+        trace("\"GSUB\" table found, offset = 0x", ptr(_tableData.offset), ", length = ", ptr(_tableData.length));
+        buffer_seek(_buffer, buffer_seek_start, _tableData.offset);
+        
+        var _majorVersion      = BUF_U16;
+        var _minorVersion      = BUF_U16;
+        var _scriptListOffset  = BUF_U16 + _tableData.offset;
+        var _featureListOffset = BUF_U16 + _tableData.offset;
+        var _lookupListOffset  = BUF_U16 + _tableData.offset;
+        
+        trace("\"GSUB\" table is version ", _majorVersion, ".", _minorVersion);
+        
+        if ((_majorVersion == 1) && (_minorVersion == 0))
+        {
+            var _featureVariationsOffset = undefined;
+        }
+        else if ((_majorVersion == 1) && (_minorVersion == 1))
+        {
+            var featureVariationsOffset = BUF_U32;
+            trace("Warning! This \"GSUB\" table version has only partial support");
+        }
+        else
+        {
+            trace("\"GSUB\" table version not supported");
+            return;
+        }
+        
+        
+        
+        buffer_seek(_buffer, buffer_seek_start, _lookupListOffset);
+        
+        var _lookupCount = BUF_U16;
+        trace("Found ", _lookupCount, " lookup tables");
+        
+        var _lookupOffsetArray = array_create(_lookupCount);
+        var _i = 0;
+        repeat(_lookupCount)
+        {
+            _lookupOffsetArray[@ _i] = BUF_U16 + _lookupListOffset;
+            ++_i;
+        }
+        
+        var _i = 0;
+        repeat(_lookupCount)
+        {
+            trace("Reading lookup table ", _i);
+            
+            var _lookupOffset = _lookupOffsetArray[_i];
+            buffer_seek(_buffer, buffer_seek_start, _lookupOffset);
+            
+            var _lookupType    = BUF_U16;
+            var _lookupFlags   = BUF_U16;
+            var _subtableCount = BUF_U16;
+            trace("Found ", _subtableCount, " subtables");
+            
+            var _subtableOffsetArray = array_create(_subtableCount);
+            var _j = 0;
+            repeat(_subtableCount)
+            {
+                _subtableOffsetArray[@ _j] = BUF_U16 + _lookupOffset;
+                ++_j;
+            }
+            
+            var _markFilteringSet = BUF_U16;
+            
+            trace("type = ", _lookupType, ", flags = ", ptr(_lookupFlags), ", mark filtering set = ", _markFilteringSet);
+            
+            var _j = 0;
+            repeat(_subtableCount)
+            {
+                var _subtableOffset = _subtableOffsetArray[@ _j];
+                trace("Reading subtable ", _j, " (of lookup table ", _i, ")");
+                
+                var _posFormat = BUF_U16;
+                switch(_posFormat)
+                {
+                    case 1:
+                        var _coverageOffset   = BUF_U16 + _subtableOffset;
+                        var _valueFormat      = BUF_U16;
+                        var _valueRecordArray = [OTFReadValueRecord(_buffer, _valueFormat, 0)];
+                    break;
+                    
+                    case 2:
+                        var _coverageOffset = BUF_U16 + _subtableOffset;
+                        var _valueFormat    = BUF_U16;
+                        var _valueCount     = BUF_U16;
+                        
+                        var _valueRecordArray = array_create(_valueCount);
+                        var _k = 0;
+                        repeat(_valueCount)
+                        {
+                            _valueRecordArray[@ _k] = [OTFReadValueRecord(_buffer, _valueFormat, 0)];
+                            ++_k;
+                        }
+                    break;
+                    
+                    default:
+                        trace("\"GPOS\" lookup subtable format ", _posFormat, " not supported");
+                    break;
+                }
+                
+                ++_j;
+            }
+            
+            ++_i;
+        }
+    }
     
     #endregion
     
