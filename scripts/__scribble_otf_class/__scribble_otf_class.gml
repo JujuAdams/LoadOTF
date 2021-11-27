@@ -342,177 +342,58 @@ function __scribble_otf_class(_filename) constructor
     
     static __read_gpos = function()
     {
-        //
-        //var _tableData = _tableDictionary[$ "GPOS"];
-        //if (!is_struct(_tableData))
-        //{
-        //    __scribble_trace("\"GPOS\" table not found");
-        //    return;
-        //}
-        //else
-        //{
-        //    __scribble_trace("\"GPOS\" table found, offset = 0x", ptr(_tableData.offset), ", length = ", ptr(_tableData.length));
-        //    buffer_seek(_buffer, buffer_seek_start, _tableData.offset);
-        //    
-        //    var _majorVersion      = BUF_U16;
-        //    var _minorVersion      = BUF_U16;
-        //    var _scriptListOffset  = BUF_U16 + _tableData.offset;
-        //    var _featureListOffset = BUF_U16 + _tableData.offset;
-        //    var _lookupListOffset  = BUF_U16 + _tableData.offset;
-        //    
-        //    __scribble_trace("\"GPOS\" table is version ", _majorVersion, ".", _minorVersion);
-        //    
-        //    if ((_majorVersion == 1) && (_minorVersion == 0))
-        //    {
-        //        var _featureVariationsOffset = undefined;
-        //    }
-        //    else if ((_majorVersion == 1) && (_minorVersion == 1))
-        //    {
-        //        var featureVariationsOffset = BUF_U32;
-        //        __scribble_trace("Warning! This \"GPOS\" table version has only partial support");
-        //    }
-        //    else
-        //    {
-        //        __scribble_trace("\"GPOS\" table version not supported");
-        //        return;
-        //    }
-        //    
-        //    
-        //    
-        //    //buffer_seek(_buffer, buffer_seek_start, _scriptListOffset);
-        //    //
-        //    //var _languageCount = BUF_U16;
-        //    //
-        //    //__scribble_trace("Found ", _languageCount, " languages");
-        //    //var _languageArray = array_create(_languageCount);
-        //    //var _i = 0;
-        //    //repeat(_languageCount)
-        //    //{
-        //    //    var _tag    = BUF_TAG;
-        //    //    var _offset = BUF_U16;
-        //    //    
-        //    //    _languageArray[@ _i] = {
-        //    //        tag    : _tag,
-        //    //        offset : _offset,
-        //    //    };
-        //    //    
-        //    //    ++_i;
-        //    //}
-        //    
-        //    
-        //    
-        //    buffer_seek(_buffer, buffer_seek_start, _lookupListOffset);
-        //    
-        //    var _lookupCount = BUF_U16;
-        //    __scribble_trace("Found ", _lookupCount, " lookup tables");
-        //    
-        //    var _lookupOffsetArray = array_create(_lookupCount);
-        //    var _i = 0;
-        //    repeat(_lookupCount)
-        //    {
-        //        _lookupOffsetArray[@ _i] = BUF_U16 + _lookupListOffset;
-        //        ++_i;
-        //    }
-        //    
-        //    var _i = 0;
-        //    repeat(_lookupCount)
-        //    {
-        //        __scribble_trace("Reading lookup table ", _i);
-        //        
-        //        var _lookupOffset = _lookupOffsetArray[_i];
-        //        buffer_seek(_buffer, buffer_seek_start, _lookupOffset);
-        //        
-        //        var _lookupType    = BUF_U16;
-        //        var _lookupFlags   = BUF_U16;
-        //        var _subtableCount = BUF_U16;
-        //        __scribble_trace("Found ", _subtableCount, " subtables");
-        //        
-        //        var _subtableOffsetArray = array_create(_subtableCount);
-        //        var _j = 0;
-        //        repeat(_subtableCount)
-        //        {
-        //            _subtableOffsetArray[@ _j] = BUF_U16 + _lookupOffset;
-        //            ++_j;
-        //        }
-        //        
-        //        var _markFilteringSet = BUF_U16;
-        //        
-        //        __scribble_trace("type = ", _lookupType, ", flags = ", ptr(_lookupFlags), ", mark filtering set = ", _markFilteringSet);
-        //        
-        //        var _j = 0;
-        //        repeat(_subtableCount)
-        //        {
-        //            var _subtableOffset = _subtableOffsetArray[@ _j];
-        //            __scribble_trace("Reading subtable ", _j, " (of lookup table ", _i, ")");
-        //            
-        //            var _posFormat = BUF_U16;
-        //            switch(_posFormat)
-        //            {
-        //                case 1:
-        //                    var _coverageOffset   = BUF_U16 + _subtableOffset;
-        //                    var _valueFormat      = BUF_U16;
-        //                    var _valueRecordArray = [OTFReadValueRecord(_buffer, _valueFormat, 0)];
-        //                break;
-        //                
-        //                case 2:
-        //                    var _coverageOffset = BUF_U16 + _subtableOffset;
-        //                    var _valueFormat    = BUF_U16;
-        //                    var _valueCount     = BUF_U16;
-        //                    
-        //                    var _valueRecordArray = array_create(_valueCount);
-        //                    var _k = 0;
-        //                    repeat(_valueCount)
-        //                    {
-        //                        _valueRecordArray[@ _k] = [OTFReadValueRecord(_buffer, _valueFormat, 0)];
-        //                        ++_k;
-        //                    }
-        //                break;
-        //                
-        //                default:
-        //                    __scribble_trace("\"GPOS\" lookup subtable format ", _posFormat, " not supported");
-        //                break;
-        //            }
-        //            
-        //            ++_j;
-        //        }
-        //        
-        //        ++_i;
-        //    }
-        //}
-        //
+        var _table_data = __master_table_dictionary[$ "GPOS"];
+        if (!is_struct(_table_data))
+        {
+            __scribble_trace("GPOS table not found");
+            return;
+        }
+        else
+        {
+            __scribble_trace("REading GPOS table");
+            buffer_seek(__buffer, buffer_seek_start, _table_data.__offset);
+            
+            var _major_version       = __read_u16();
+            var _minor_version       = __read_u16();
+            var _script_list_offset  = __read_u16() + _table_data.__offset;
+            var _feature_list_offset = __read_u16() + _table_data.__offset;
+            var _lookup_list_offset  = __read_u16() + _table_data.__offset;
+            
+            __scribble_trace("GPOS table is version ", _major_version, ".", _minor_version);
+            
+            if ((_major_version == 1) && (_minor_version == 0))
+            {
+                var _feature_variations_offset = undefined;
+            }
+            else if ((_major_version == 1) && (_minor_version == 1))
+            {
+                var _feature_variations_offset = BUF_U32;
+                __scribble_trace("Warning! This GPOS table version has only partial support");
+            }
+            else
+            {
+                __scribble_trace("GPOS table version not supported");
+                return;
+            }
+            
+            buffer_seek(__buffer, buffer_seek_start, _lookup_list_offset);
+            
+            var _lookup_count = __read_u16();
+            __scribble_trace("Found ", _lookup_count, " lookup tables");
+            var _lookup_offset_array = __scribble_otf_buffer_read_array(__buffer, _lookup_count, buffer_u16, _lookup_list_offset);
+            
+            var _i = 0;
+            repeat(_lookup_count)
+            {
+                var _lookup_table = __scribble_otf_lookup_table(buffer, _lookup_offset_array[_i]);
+                ++_i;
+            }
+        }
     }
     
     static __read_gsub = function()
     {
         //TODO
-    }
-    
-    static __read_value_record = function(_offset, _format, _parentOffset)
-    {
-        var _record = {
-            __x_placement               : undefined,
-            __y_lacement                : undefined,
-            __x_advance                 : undefined,
-            __y_advance                 : undefined,
-            __x_placement_device_offset : undefined,
-            __y_placement_device_offset : undefined,
-            __x_advance_device_offset   : undefined,
-            __y_advance_device_offset   : undefined,
-        };
-        
-        with(_record)
-        {
-            if (_format & 0x0001) __x_placement               = __read_s16();
-            if (_format & 0x0002) __y_lacement                = __read_s16();
-            if (_format & 0x0004) __x_advance                 = __read_s16();
-            if (_format & 0x0008) __y_advance                 = __read_s16();
-            if (_format & 0x0010) __x_placement_device_offset = __read_u16() + _parentOffset;
-            if (_format & 0x0020) __y_placement_device_offset = __read_u16() + _parentOffset;
-            if (_format & 0x0040) __x_advance_device_offset   = __read_u16() + _parentOffset;
-            if (_format & 0x0080) __y_advance_device_offset   = __read_u16() + _parentOffset;
-        }
-        
-        return _record;
     }
     
     static __read_u8 = function()

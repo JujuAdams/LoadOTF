@@ -1,9 +1,11 @@
 {
   "resources": [
+    {"id":{"name":"__scribble_otf_lookup_table","path":"scripts/__scribble_otf_lookup_table/__scribble_otf_lookup_table.yy",},"order":1,},
     {"id":{"name":"__scribble_otf_class","path":"scripts/__scribble_otf_class/__scribble_otf_class.yy",},"order":0,},
     {"id":{"name":"trace","path":"scripts/trace/trace.yy",},"order":5,},
+    {"id":{"name":"__scribble_otf_value_record","path":"scripts/__scribble_otf_value_record/__scribble_otf_value_record.yy",},"order":2,},
     {"id":{"name":"oTest","path":"objects/oTest/oTest.yy",},"order":2,},
-    {"id":{"name":"__scribble_buffer","path":"scripts/__scribble_buffer/__scribble_buffer.yy",},"order":1,},
+    {"id":{"name":"__scribble_buffer","path":"scripts/__scribble_buffer/__scribble_buffer.yy",},"order":3,},
     {"id":{"name":"LoadOTF","path":"scripts/LoadOTF/LoadOTF.yy",},"order":3,},
     {"id":{"name":"rMain","path":"rooms/rMain/rMain.yy",},"order":1,},
   ],
